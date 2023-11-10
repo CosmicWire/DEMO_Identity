@@ -1,0 +1,17 @@
+{
+  "localnet": {
+    "programIds": {
+      "cosmicIdentity": "8AWRJGctBW7QJD18oowxiNcWy3K2HGEQPDSAu4WcLMdF"
+    }
+  },
+  "devnet": {
+    "programIds": {
+      "cosmicIdentity": "8AWRJGctBW7QJD18oowxiNcWy3K2HGEQPDSAu4WcLMdF"
+    }
+  },
+  "mainnet-beta": {
+    "programIds": {
+      "cosmicIdentity": "8AWRJGctBW7QJD18oowxiNcWy3K2HGEQPDSAu4WcLMdF"
+    }
+  }
+}

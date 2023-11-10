@@ -1,0 +1,70 @@
+/// Addresses
+deployer - Gywqqwo9vj3Fu4JCBrXHWNJi2etjLhgGMXG219skzGbU (keys/deployer.json)
+brand - HALymjQoA8T6hJ2i65KPzp2nGd2grBscsyhYair5iMqp (keys/brand.json)
+influencer - C6RWeYbnMpV8SamY8MEaf2ZJ5J3ScURUPpGEQjQst28P (keys/influencer.json)
+
+/// Run scripts
+yarn ts-node <command>    // Run cli as deployer (admin)
+yarn ts-node-brand <command>      // Run cli as brand
+yarn ts-node-influencer <command>     // Run cli as influencer
+
+/// As deployer (admin)
+yarn ts-node init_global
+yarn ts-node global_status
+yarn ts-node point_status -a Gywqqwo9vj3Fu4JCBrXHWNJi2etjLhgGMXG219skzGbU
+
+/// As admin
+yarn ts-node set_config_multiplier --type type1 --numerator 2 --denumerator 3
+yarn ts-node set_config_fees --fee-numerator 3 --fee-denumerator 4
+yarn ts-node set_config_periods --release-period 60 --accept-period 60 --claim-after 60 --approve-result 120
+yarn ts-node transfer_admin -a Gywqqwo9vj3Fu4JCBrXHWNJi2etjLhgGMXG219skzGbU
+yarn ts-node add_global_scale -t acceptOrder -b 300 -v 120
+yarn ts-node add_global_scale -t acceptOrder -b 200 -v 240
+yarn ts-node global_status
+yarn ts-node remove_global_scale -t acceptOrder -i 1
+yarn ts-node global_status
+
+/// As user (brand / influencer)
+yarn ts-node-brand init_influencer
+yarn ts-node-brand point_status -a HALymjQoA8T6hJ2i65KPzp2nGd2grBscsyhYair5iMqp
+yarn ts-node-influencer init_influencer
+yarn ts-node-influencer point_status -a C6RWeYbnMpV8SamY8MEaf2ZJ5J3ScURUPpGEQjQst28P
+
+/// Reject order by influencer
+yarn ts-node-brand create_order -t post -a C6RWeYbnMpV8SamY8MEaf2ZJ5J3ScURUPpGEQjQst28P -r 1689965544 -p 20 -d "RAW_DATA"
+yarn ts-node campaign_status -c 1
+yarn ts-node-influencer reject_order -c 1
+yarn ts-node-brand claim_order -c 1   // Should able to refund cause influencer rejected the order
+
+/// Accepted order but not completed in time
+yarn ts-node-brand create_order -t post -a C6RWeYbnMpV8SamY8MEaf2ZJ5J3ScURUPpGEQjQst28P -r 1689965695 -p 10 -d "RAW_DATA"
+yarn ts-node-influencer accept_order -c 2
+yarn ts-node campaign_status -c 2
+yarn ts-node global_status
+// Await for 60 sec cause global claim after period config is 60 sec
+yarn ts-node-brand claim_delayed_order -c 2   // Should able to refund if influencer not complete in time
+yarn ts-node campaign_status -c 2
+
+/// Completed order by influencer but rejected result by brand
+yarn ts-node-brand create_order -t post -a C6RWeYbnMpV8SamY8MEaf2ZJ5J3ScURUPpGEQjQst28P -r 1689966715 -p 10 -d "RAW_DATA"
+yarn ts-node-influencer accept_order -c 3
+yarn ts-node-influencer complete_order -c 3
+yarn ts-node-brand reject_result -c 3
+yarn ts-node campaign_status -c 3
+
+/// Approved order result by brand
+yarn ts-node-brand create_order -t post -a C6RWeYbnMpV8SamY8MEaf2ZJ5J3ScURUPpGEQjQst28P -r 1689966982 -p 10 -d "RAW_DATA"
+yarn ts-node-influencer accept_order -c 4
+yarn ts-node-influencer complete_order -c 4
+yarn ts-node-brand approve_result -c 4 -s 100
+yarn ts-node campaign_status -c 4
+
+/// Completed order but brand not approve in time
+yarn ts-node-brand create_order -t post -a C6RWeYbnMpV8SamY8MEaf2ZJ5J3ScURUPpGEQjQst28P -r 1689967194 -p 10 -d "RAW_DATA"
+yarn ts-node global_status  // Approve period is 120s
+yarn ts-node-influencer accept_order -c 5
+yarn ts-node-influencer complete_order -c 5
+yarn ts-node campaign_status -c 5
+// Await 120s to pass auto approve result time
+yarn ts-node-influencer claim_auto_approve -c 5
+yarn ts-node campaign_status -c 5

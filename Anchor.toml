@@ -1,0 +1,22 @@
+[features]
+seeds = false
+skip-lint = false
+[programs.localnet]
+hello_anchor = "8AWRJGctBW7QJD18oowxiNcWy3K2HGEQPDSAu4WcLMdF"
+[programs.devnet]
+hello_anchor = "8AWRJGctBW7QJD18oowxiNcWy3K2HGEQPDSAu4WcLMdF"
+[programs.testnet]
+hello_anchor = "8AWRJGctBW7QJD18oowxiNcWy3K2HGEQPDSAu4WcLMdF"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "/root/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+
+[test.validator]
+url = "https://api.mainnet-beta.solana.com"
