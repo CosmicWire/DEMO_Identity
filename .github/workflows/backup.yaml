@@ -1,0 +1,41 @@
+# This  is for backing up the repo to CosmicWire's off-site S3 backup
+
+name: Backup 2 s3
+on:
+  create:
+    branches: [ "*" ]
+  push:
+    branches: [ "*" ]
+
+
+env:
+  BACKUP_BUCKET: ${{ secrets.BACKUP_BUCKET }}
+  AWS_EC2_METADATA_DISABLED: true
+  AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.BACKUP_REGION }}
+
+jobs:
+  Backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read 
+    
+    steps:   
+    - name: Get repo
+      uses: actions/checkout@v3
+        
+    - name: Backup
+      shell: bash
+      run: |
+        echo "Backing up Repo"
+        echo "looking for source dir"
+        cd ..
+        echo "checking the dir"
+        ls
+        tar -zcf ${GITHUB_REPOSITORY##*/}-$GITHUB_REF_NAME.tar.gz ${GITHUB_REPOSITORY##*/}/
+        echo "checking the dir after tar"
+        ls
+        aws s3 cp ${GITHUB_REPOSITORY##*/}-$GITHUB_REF_NAME.tar.gz s3://$BACKUP_BUCKET
+        #tar -zcf ${GITHUB_REPOSITORY##*/}-$GITHUB_SHA.tar.gz ${GITHUB_REPOSITORY##*/}/
+        #aws s3 cp ${GITHUB_REPOSITORY##*/}-$GITHUB_SHA.tar.gz s3://$BACKUP_BUCKET
